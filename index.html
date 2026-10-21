@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker - Personal Finance Dashboard</title>
+  <meta name="description" content="A simple, elegant glassmorphic personal expense tracker to record income and expenses, calculate balances, and visualize category spending.">
+  
+  <!-- Modern Clean Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Decorative ambient lighting for glassmorphic depth -->
+  <div class="bg-glow-top" aria-hidden="true"></div>
+  <div class="bg-glow-bottom" aria-hidden="true"></div>
+
+  <!-- Main Container -->
+  <div class="container">
+    
+    <!-- Top Dashboard Header -->
+    <header class="glass-panel" id="mainHeader">
+      <div class="brand-section">
+        <h1>Expense <span>Tracker</span></h1>
+        <p>Track your money. Understand your spending.</p>
+      </div>
+      <div>
+        <button id="openAddModalBtn" class="btn btn-primary" type="button">
+          + Add Transaction
+        </button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD VIEW -->
+    <main id="dashboardView" class="dashboard-view">
+      
+      <!-- Summary Metrics Grid -->
+      <section class="summary-grid" aria-label="Financial Summary">
+        <!-- Total Balance -->
+        <article class="glass-panel summary-card card-balance">
+          <div class="summary-label">Total Balance</div>
+          <div class="summary-amount amount-balance" id="totalBalance">₹0</div>
+        </article>
+
+        <!-- Total Income -->
+        <article class="glass-panel summary-card card-income">
+          <div class="summary-label">Total Income</div>
+          <div class="summary-amount amount-income" id="totalIncome">₹0</div>
+        </article>
+
+        <!-- Total Expenses -->
+        <article class="glass-panel summary-card card-expense">
+          <div class="summary-label">Total Expenses</div>
+          <div class="summary-amount amount-expense" id="totalExpense">₹0</div>
+        </article>
+      </section>
+
+      <!-- Dashboard Main Content Grid -->
+      <div class="dashboard-layout">
+        
+        <!-- Left Column: Recent Transactions -->
+        <section class="glass-panel content-box" aria-label="Recent Transactions">
+          <div class="section-header">
+            <h2 class="section-title">Recent Transactions</h2>
+            <span id="transactionCountBadge" style="font-size: 0.8rem; color: var(--text-muted);">0 items</span>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="filters-container">
+            <div class="search-input-box">
+              <input 
+                type="text" 
+                id="searchQuery" 
+                class="input-field" 
+                placeholder="Search transaction by title..." 
+                aria-label="Search transactions"
+              >
+            </div>
+            <div class="filter-row">
+              <select id="typeFilter" class="select-field" aria-label="Filter by type">
+                <option value="all">All Types (Income & Expenses)</option>
+                <option value="income">Income Only</option>
+                <option value="expense">Expenses Only</option>
+              </select>
+              <select id="categoryFilter" class="select-field" aria-label="Filter by category">
+                <option value="all">All Categories</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Education">Education</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Salary">Salary</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Transaction List Items -->
+          <ul class="transaction-list" id="transactionList" aria-live="polite">
+            <!-- Dynamically populated by renderTransactions() -->
+          </ul>
+        </section>
+
+        <!-- Right Column: Category Breakdown -->
+        <section class="glass-panel content-box" aria-label="Spending Breakdown">
+          <div class="section-header">
+            <h2 class="section-title">Spending by Category</h2>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            Distribution of expense transactions across categories.
+          </p>
+          
+          <div id="categoryBreakdownContainer" class="breakdown-list">
+            <!-- Dynamically rendered horizontal bars by renderCategoryBreakdown() -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- PRIVACY POLICY VIEW -->
+    <section id="privacyView" class="info-view" aria-label="Privacy Policy View">
+      <div class="glass-panel info-card">
+        <button id="backFromPrivacyBtn" class="btn btn-secondary" style="margin-bottom: 1.25rem;">
+          &larr; Return to Dashboard
+        </button>
+        <h2>Privacy Policy</h2>
+        <p>Last updated: October 2026</p>
+
+        <h3>1. Local Storage Only</h3>
+        <p>
+          Expense Tracker does not collect, transmit, or synchronize any personal or financial information with external servers. All transaction details entered—such as title, category, date, and monetary values—are retained exclusively inside your own web browser using the HTML5 localStorage API.
+        </p>
+
+        <h3>2. No Account Required</h3>
+        <p>
+          You do not need to register, provide an email address, or create a password to use this application. The application runs entirely on your local device.
+        </p>
+
+        <h3>3. Clearing Your Data</h3>
+        <p>
+          You remain in full control of your data. You may delete individual transactions directly through the dashboard interface or purge all stored entries at any time by clearing your browser's site cookies and local storage.
+        </p>
+      </div>
+    </section>
+
+    <!-- TERMS & CONDITIONS VIEW -->
+    <section id="termsView" class="info-view" aria-label="Terms and Conditions View">
+      <div class="glass-panel info-card">
+        <button id="backFromTermsBtn" class="btn btn-secondary" style="margin-bottom: 1.25rem;">
+          &larr; Return to Dashboard
+        </button>
+        <h2>Terms and Conditions</h2>
+        <p>Last updated: October 2026</p>
+
+        <h3>1. Intended Purpose</h3>
+        <p>
+          This Expense Tracker is designed strictly as an educational and personal budgeting utility. It assists users with tracking day-to-day income and expenses on their personal computer or mobile browser.
+        </p>
+
+        <h3>2. Data Loss & Storage Limitations</h3>
+        <p>
+          Because all records reside locally inside your browser's storage cache, clearing browser history, utilizing private browsing mode, or uninstalling your web browser will permanently remove saved transactions. We recommend recording critical records elsewhere.
+        </p>
+
+        <h3>3. User Responsibility</h3>
+        <p>
+          The user is solely responsible for ensuring the accuracy of all values entered into the application. Calculations and category summaries reflect solely user-provided inputs.
+        </p>
+
+        <h3>4. No Financial Advice</h3>
+        <p>
+          This web application does not offer professional accounting, tax, investment, or legal advice. If you require financial consultation, please consult a certified financial advisor.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL: ADD TRANSACTION -->
+  <div class="modal-overlay" id="addModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="glass-panel modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Add Transaction</h2>
+        <p class="modal-desc">Record a new income or expense transaction.</p>
+      </div>
+
+      <form id="addTransactionForm" novalidate>
+        <!-- Title Field -->
+        <div class="form-group">
+          <label class="form-label" for="txTitle">Transaction Title</label>
+          <input 
+            type="text" 
+            id="txTitle" 
+            class="input-field" 
+            placeholder="e.g. Grocery Shopping, Monthly Salary" 
+            required
+          >
+          <div class="form-error" id="titleError">Please enter a transaction title.</div>
+        </div>
+
+        <!-- Amount Field -->
+        <div class="form-group">
+          <label class="form-label" for="txAmount">Amount (₹)</label>
+          <input 
+            type="number" 
+            id="txAmount" 
+            class="input-field" 
+            placeholder="e.g. 850" 
+            step="0.01" 
+            min="0.01" 
+            required
+          >
+          <div class="form-error" id="amountError">Please enter a valid amount greater than 0.</div>
+        </div>
+
+        <!-- Type Field -->
+        <div class="form-group">
+          <label class="form-label" for="txType">Transaction Type</label>
+          <select id="txType" class="select-field" required>
+            <option value="expense">Expense (-)</option>
+            <option value="income">Income (+)</option>
+          </select>
+        </div>
+
+        <!-- Category Field -->
+        <div class="form-group">
+          <label class="form-label" for="txCategory">Category</label>
+          <select id="txCategory" class="select-field" required>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Education">Education</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Bills">Bills</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Salary">Salary</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Date Field -->
+        <div class="form-group">
+          <label class="form-label" for="txDate">Date</label>
+          <input type="date" id="txDate" class="input-field" required>
+          <div class="form-error" id="dateError">Please select a valid date.</div>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="modal-actions">
+          <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DELETE CONFIRMATION -->
+  <div class="modal-overlay" id="deleteConfirmModal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+    <div class="glass-panel modal-box" style="max-width: 420px; text-align: center;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--coral-expense);">🗑️</div>
+      <h2 class="modal-title" id="deleteModalTitle" style="font-size: 1.25rem;">Delete Transaction?</h2>
+      <p id="deleteConfirmText" class="modal-desc" style="margin: 0.75rem 0 1.5rem 0; font-size: 0.92rem; line-height: 1.5;">
+        Are you sure you want to remove this record? This action cannot be undone.
+      </p>
+      <div class="modal-actions" style="justify-content: center; gap: 1rem; margin-top: 0;">
+        <button type="button" id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger-outline" style="background: rgba(248, 113, 113, 0.2); border-color: var(--coral-expense); padding: 0.75rem 1.4rem; font-size: 0.92rem;">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div>Expense Tracker &bull; Personal Finance Management</div>
+      <div class="footer-links">
+        <a href="#privacy" id="privacyLink">Privacy Policy</a>
+        <a href="#terms" id="termsLink">Terms and Conditions</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- External Script -->
+  <script src="script.js"></script>
+</body>
+</html>
